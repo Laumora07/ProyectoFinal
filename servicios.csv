@@ -1,4 +1,4 @@
-id_servicios,id_cuenta,codigo,descripcion_servicio
+Id_servicios,Cuenta,Codigo,Descripcion_servicio
 "65","22",IBI,IMPUESTO SOBRE LA PROPIEDAD DE BIENES INMUEBLES
 "66","22",S17,BASURA COMERCIAL C5
 "67","22",S19,MANT. PARQUES Y ZONAS VERDES
