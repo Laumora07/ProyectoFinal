@@ -30,17 +30,17 @@ st.write(
 @st.cache_data
 def cargar_datos():
     cuentas = pd.read_csv(
-        "https://raw.githubusercontent.com/Laumora07/tarea-02-python/main/cuentas.csv",
+        "https://raw.githubusercontent.com/Laumora07/ProyectoFinal/main/cuentas.csv",
         sep=";"
     )
 
     servicios = pd.read_csv(
-        "https://raw.githubusercontent.com/Laumora07/tarea-02-python/main/servicios.csv",
+        "https://raw.githubusercontent.com/Laumora07/ProyectoFinal/main/servicios.csv",
         sep=";"
     )
 
     catastro = gpd.read_file(
-        "https://raw.githubusercontent.com/Laumora07/tarea-02-python/main/catastro.gpkg"
+        "https://raw.githubusercontent.com/Laumora07/ProyectoFinal/main/catastro.gpkg"
     )
 
     return cuentas, servicios, catastro

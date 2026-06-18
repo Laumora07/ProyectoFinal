@@ -4,3 +4,6 @@ geopandas
 plotly
 folium
 streamlit-folium
+fiona
+pyogrio
+shapely
