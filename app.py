@@ -174,16 +174,23 @@ st.plotly_chart(fig, use_container_width=True)
 st.header("Mapa interactivo")
 
 st.write(
-    "El mapa muestra la ubicación de los predios correspondientes a los servicios seleccionados."
+    "El mapa muestra la ubicación aproximada de los predios "
+    "correspondientes a los servicios seleccionados."
 )
 
-# Convertir las geometrías a coordenadas geográficas
+# Convertir a coordenadas geográficas
 datos_mapa = datos_filtrados.to_crs(epsg=4326)
 
-# Obtener el centro del mapa
+# Crear una copia para no modificar el original
+datos_mapa = datos_mapa.copy()
+
+# Calcular centroides
+datos_mapa["centroide"] = datos_mapa.geometry.centroid
+
+# Centro del mapa
 centro = [
-    datos_mapa.geometry.unary_union.centroid.y,
-    datos_mapa.geometry.unary_union.centroid.x,
+    datos_mapa["centroide"].y.mean(),
+    datos_mapa["centroide"].x.mean()
 ]
 
 # Crear mapa base
@@ -193,25 +200,26 @@ m = folium.Map(
     tiles="OpenStreetMap"
 )
 
-# ------------------------------------------------------------
-# Agregar cada predio como un polígono al mapa interactivo.
-# -----------------------------------------------------------
+# Agregar un marcador circular por cada predio
+for _, fila in datos_mapa.iterrows():
 
-folium.GeoJson(
-    datos_mapa.__geo_interface__,
-    style_function=lambda feature: {
-        "fillColor": "#4CAF50",
-        "color": "#666666",
-        "weight": 0.5,
-        "fillOpacity": 0.4,
-    },
-    tooltip=folium.GeoJsonTooltip(
-        fields=["id_finca", "descripcion_servicio"],
-        aliases=["ID Finca:", "Servicio:"],
-    ),
-).add_to(m)
+    folium.CircleMarker(
+        location=[
+            fila["centroide"].y,
+            fila["centroide"].x
+        ],
+        radius=2,
+        color="blue",
+        fill=True,
+        fill_color="blue",
+        fill_opacity=0.7,
+        tooltip=(
+            f"ID Finca: {fila['id_finca']}<br>"
+            f"Servicio: {fila['descripcion_servicio']}"
+        ),
+    ).add_to(m)
 
-# Mostrar mapa en Streamlit
+# Mostrar el mapa en Streamlit
 st_folium(
     m,
     width=900,
