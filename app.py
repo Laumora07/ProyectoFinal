@@ -91,7 +91,7 @@ catastro_cuentas = catastro.merge(
 
 # Unir con servicios
 catastro_total = catastro_cuentas.merge(
-    servicios,
+    servicios,https://github.com/Laumora07/ProyectoFinal/blob/main/app.py
     on="id_cuenta",
     how="left"
 )
@@ -197,27 +197,24 @@ m = folium.Map(
 # Agregar cada predio como un polígono al mapa interactivo.
 # -----------------------------------------------------------
 
-for _, fila in datos_mapa.iterrows():
-
-    folium.GeoJson(
-        fila.geometry.__geo_interface__,
-      style_function=lambda feature: {
-    "fillColor": "#4CAF50",   # Verde suave
-    "color": "#666666",       # Borde gris
-    "weight": 0.5,            # Borde más delgado
-    "fillOpacity": 0.4,       # Más transparente
-},
-        tooltip=folium.Tooltip(
-            f"""
-            ID Finca: {fila['id_finca']}<br>
-            Servicio: {fila['descripcion_servicio']}
-            """
-        ),
-    ).add_to(m)
+folium.GeoJson(
+    datos_mapa.__geo_interface__,
+    style_function=lambda feature: {
+        "fillColor": "#4CAF50",
+        "color": "#666666",
+        "weight": 0.5,
+        "fillOpacity": 0.4,
+    },
+    tooltip=folium.GeoJsonTooltip(
+        fields=["id_finca", "descripcion_servicio"],
+        aliases=["ID Finca:", "Servicio:"],
+    ),
+).add_to(m)
 
 # Mostrar mapa en Streamlit
 st_folium(
     m,
     width=900,
     height=600,
+    key="mapa_principal"
 )
