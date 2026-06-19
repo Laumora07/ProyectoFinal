@@ -1,9 +1,8 @@
-streamlit
+streamlit==1.45.1
+streamlit-folium==0.25.0
+folium==0.20.0
 pandas
 geopandas
 plotly
-folium
-streamlit-folium
-fiona
 pyogrio
 shapely
