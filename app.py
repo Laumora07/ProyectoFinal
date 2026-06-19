@@ -91,7 +91,7 @@ catastro_cuentas = catastro.merge(
 
 # Unir con servicios
 catastro_total = catastro_cuentas.merge(
-    servicios,https://github.com/Laumora07/ProyectoFinal/blob/main/app.py
+    servicios,
     on="id_cuenta",
     how="left"
 )
@@ -174,55 +174,39 @@ st.plotly_chart(fig, use_container_width=True)
 st.header("Mapa interactivo")
 
 st.write(
-    "El mapa muestra la ubicación aproximada de los predios "
-    "correspondientes a los servicios seleccionados."
+    "El mapa muestra la ubicación de los predios correspondientes a los servicios seleccionados."
 )
 
 # Convertir a coordenadas geográficas
 datos_mapa = datos_filtrados.to_crs(epsg=4326)
 
-# Crear una copia para no modificar el original
-datos_mapa = datos_mapa.copy()
-
-# Calcular centroides
-datos_mapa["centroide"] = datos_mapa.geometry.centroid
-
-# Centro del mapa
-centro = [
-    datos_mapa["centroide"].y.mean(),
-    datos_mapa["centroide"].x.mean()
-]
-
 # Crear mapa base
 m = folium.Map(
-    location=centro,
-    zoom_start=16,
-    tiles="OpenStreetMap"
+    location=[
+        datos_mapa.total_bounds[1:4:2].mean(),
+        datos_mapa.total_bounds[0:3:2].mean()
+    ],
+    zoom_start=16
 )
 
-# Agregar un marcador circular por cada predio
-for _, fila in datos_mapa.iterrows():
+# Dibujar las geometrías directamente
+folium.GeoJson(
+    datos_mapa[["id_finca", "descripcion_servicio", "geometry"]].to_json(),
+    tooltip=folium.GeoJsonTooltip(
+        fields=["id_finca", "descripcion_servicio"],
+        aliases=["ID Finca", "Servicio"]
+    ),
+    style_function=lambda x: {
+        "fillColor": "#4CAF50",
+        "color": "#555555",
+        "weight": 0.5,
+        "fillOpacity": 0.4
+    }
+).add_to(m)
 
-    folium.CircleMarker(
-        location=[
-            fila["centroide"].y,
-            fila["centroide"].x
-        ],
-        radius=2,
-        color="blue",
-        fill=True,
-        fill_color="blue",
-        fill_opacity=0.7,
-        tooltip=(
-            f"ID Finca: {fila['id_finca']}<br>"
-            f"Servicio: {fila['descripcion_servicio']}"
-        ),
-    ).add_to(m)
-
-# Mostrar el mapa en Streamlit
 st_folium(
     m,
     width=900,
     height=600,
-    key="mapa_principal"
+    key="mapa"
 )
